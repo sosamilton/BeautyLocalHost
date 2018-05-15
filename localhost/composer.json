@@ -1,0 +1,5 @@
+{
+    "require": {
+        "cronfig/sysinfo": "^1.0"
+    }
+}
