@@ -24,15 +24,16 @@ function isNotExclude($string) {
 function getProyectFile($dir, $proyectFile = 'info.json'){
   $infoFile = __DIR__."/info.json";
   if (!file_exists($dir."/".$proyectFile)){
-    copy($infoFile, $dir."/".$proyectFile);
+    if (copy($infoFile, $dir."/".$proyectFile)) {
+      chmod($dir."/".$proyectFile, 0775);
+    }
   }
-
   $info = file_get_contents($dir."/".$proyectFile);
   $proyect = json_decode($info, true);
   if ($proyect == NULL){
     $proyect['error'] = "el archivo info.json del proyecto tiene un error al validar";
   }
-
+  return $proyect;
 }
 
 function getGitStatus($dir){
@@ -53,7 +54,6 @@ function getFolderSize($dir)
     }
     return $size;
 }
-
 $str = 'info.json';
 $dirs = array_filter(glob('*'), 'is_dir');
 $host = '127.0.0.1';

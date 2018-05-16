@@ -1,3 +1,4 @@
+
 <!-- TABLE: LATEST ORDERS -->
 <div class="box box-primary">
   <div class="box-header with-border">
@@ -11,8 +12,8 @@
   </div>
   <!-- /.box-header -->
   <div class="box-body">
-    <div class="table-responsive">
-      <table class="table no-margin">
+    <div class="table-responsive ">
+      <table class="table no-margin table-hover">
         <thead>
         <tr>
           <th>Name</th>
@@ -25,22 +26,23 @@
         <?PHP
           foreach ($dirs as $key => $dir) {
             $proyect = getProyectFile($dir);
-
             $gitStatus = getGitStatus($dir);
-            $size = getFolderSize(__DIR__."/".$dir);
             // si es git le pido la rama
             if (isNotExclude($dir)) {
             ?>
-              <tr>
-                  <td><a href="<?= $dir."/" ?>"><?= (empty($proyect['title']))? $dir : $proyect['title']; ?></a></td>
-                  <td><?= $proyect['description']; ?></td>
+              <tr class="proyect<?=$key?>">
+                  <td><a href="<?= $dir."/" ?>" class="title"><?= (empty($proyect['title']))? $dir : $proyect['title']; ?></a></td>
+                  <td class="description"><?= $proyect['description']; ?></td>
                   <td><span class="label <?= ($gitStatus <> "local") ? 'label-success' : 'label-default'?>"> <i class="fa <?= ($gitStatus <> "local") ? 'fa-code-fork' : 'fa-folder'?>"> <?= $gitStatus ?></span></td>
                   <td>
                     <div class="btn-group">
-                      <button type="button" class="btn btn-success" title="run production" ><i class="fa fa-check-square"></i></button>
-                      <button type="button" class="btn btn-primary" title="run development"><i class="fa  fa-check-square-o"></i></button>
-                      <button type="button" class="btn btn-info" title="edit data" data-toggle="modal" data-target="#modal-default" data-type="<?= $dir ?>"><i class="fa  fa-pencil"></i></button>
+                      <a type="button" class="btn btn-success" title="run production" href="<?= $dir."/".$proyect['run'] ?>" ><i class="fa fa-check-square"></i></a>
+                      <a type="button" class="btn btn-primary" title="run development" href="<?= $dir."/".$proyect['dev-run'] ?>" ><i class="fa  fa-check-square-o"></i></a>
+                      <button type="button" class="btn btn-info" title="edit" data-toggle="modal" data-target="#modal" data-title="<?= $dir?>" data-proyect="proyect<?=$key?>"><i class="fa  fa-pencil"></i></button>
                     </div>
+                    <script type="text/javascript">
+                          var proyect<?=$key?> = <?= json_encode($proyect) ?>;
+                    </script>
                   </td>
               </tr>
             <?PHP

@@ -1,5 +1,7 @@
 <?php
 require "localhost/index.php";
+// set relative route where from folder localhost
+$localdir = "/localhost/";
 ?>
 
 <!DOCTYPE html>
@@ -11,18 +13,16 @@ require "localhost/index.php";
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
-  <link rel="stylesheet" href="localhost/adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="<?= $localdir ?>css/bootstrap.min.css">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="localhost/adminlte/bower_components/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="<?= $localdir ?>css/font-awesome.min.css">
   <!-- Ionicons -->
-  <link rel="stylesheet" href="localhost/adminlte/bower_components/Ionicons/css/ionicons.min.css">
-  <!-- jvectormap -->
-  <link rel="stylesheet" href="localhost/adminlte/bower_components/jvectormap/jquery-jvectormap.css">
+  <link rel="stylesheet" href="<?= $localdir ?>css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="localhost/adminlte/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="<?= $localdir ?>css/AdminLTE.min.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
-  <link rel="stylesheet" href="localhost/adminlte/dist/css/skins/_all-skins.min.css">
+  <link rel="stylesheet" href="<?= $localdir ?>css/skin-blue.min.css">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -177,36 +177,70 @@ require "localhost/index.php";
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">×</span></button>
-      <h4 class="modal-title">Edit <b class="proyect-name"></b></h4>
+      <h4 class="modal-title">Editando informacion del proyecto:  <b class="proyect-name"></b></h4>
     </div>
-    <div class="modal-body">
-      <p>One fine body…</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-      <button type="button" class="btn btn-primary">Save changes</button>
-    </div>
+    <form class="form-horizontal" id="form-info" >
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
   </div>
   <!-- /.modal-content -->
 </div>
 <!-- ./wrapper -->
 
 <!-- jQuery 3 -->
-<script src="localhost/adminlte/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="localhost/adminlte/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="localhost/adminlte/dist/js/adminlte.min.js"></script>
-<script src="localhost/adminlte/dist/js/pages/dashboard2.js"></script>
-<script src="localhost/adminlte/dist/js/demo.js"></script>
+<script src="<?= $localdir ?>js/jquery.min.js"></script>
+<script src="<?= $localdir ?>js/bootstrap.min.js"></script>
+<script src="<?= $localdir ?>js/adminlte.min.js"></script>
+<script src="<?= $localdir ?>adminlte/dist/js/demo.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
   $('#modal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    $
-    var recipient = button.data('whatever')
-    var modal = $(this)
-    modal.find('.modal-title').text('New message to ' + recipient)
-    modal.find('.modal-body input').val(recipient)
+    var button = $(event.relatedTarget); // Button that triggered the modal
+    var info = eval(button.data('proyect'));
+    var title = (info.title === 0)? button.data('title') : info.title;
+    var modal = $(this);
+    modal.find('.modal-body').html(' ');
+    modal.find('.proyect-name').text(title);
+    modal.find('.modal-body').append('<input type="hidden" name="dir" value="'+button.data('title')+'" />');
+    modal.find('.modal-body').append('<input type="hidden" name="proyect" value="'+button.data('proyect')+'" />');
+    $.each(info, function(name, val) {
+      var html = "<div class='form-group'> <label class='col-sm-2 control-label'>"+name.toUpperCase()+"</label> <div class='col-sm-10'><input class='form-control' name ='"+name+"' value='"+val+"' type='text'></div></div>";
+      modal.find('.modal-body').append(html);
+    })
   });
+  $("#form-info").submit(function(e) {
+      var url = <?= $localdir ?>+"update-info.php"; // the script where you handle the form input.
+      $.ajax({
+             type: "POST",
+             url: url,
+             data: $("#form-info").serialize(), // serializes the form's elements.
+             success: function(data)
+             {
+               var newData = eval(data['proyect']);
+               var proyect = data['proyect'];
+               delete data['proyect'];
+               newData = data;
+               var tr = $("."+proyect);
+               for (var i in data){
+                  if (i === "title") {
+                    if (data[i] !== 0) {
+                      $(tr).find('.'+i).html(data[i]);
+                    }
+                  }else{
+                    $(tr).find('.'+i).html(data[i]);
+                  }
+               }
+               $('#modal').modal('hide');
+             }
+           });
+      e.preventDefault(); // avoid to execute the actual submit of the form.
+  });
+
 });
 </script>
 </body>
